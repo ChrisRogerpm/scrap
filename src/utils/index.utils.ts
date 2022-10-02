@@ -29,7 +29,8 @@ export const getUrls = async (pages: number = 1) => {
         maxConcurrency: 10,
         puppeteerOptions: {
             headless: false,
-            args: ["--no-sandbox"]
+            args: ["--no-sandbox"],
+            executablePath: '/usr/bin/chromium-browser'
         },
     });
     let list: string[] = []
@@ -71,8 +72,10 @@ export const getMultipleUrls = async (listurl: string[]) => {
         maxConcurrency: 10,
         puppeteerOptions: {
             headless: false,
-            args: ["--no-sandbox"]
+            args: ["--no-sandbox"],
+            executablePath: '/usr/bin/chromium-browser'
         },
+        
     });
     const list: Property[] = []
     await cluster.task(async ({ page, data: url }) => {
