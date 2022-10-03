@@ -31,8 +31,9 @@ export async function generateData(req: Request, _res: Response) {
 export const userProperties = (req: Request, res: Response) => {
     const obj = req.params
     let properties: Property[] = []
-    if (fs.existsSync('../../properties.json')) {
-        properties = JSON.parse(fs.readFileSync('../../properties.json', 'utf8'));
+    const currentPath = `${process.cwd()}/properties.json`;
+    if (fs.existsSync(currentPath)) {
+        properties = JSON.parse(fs.readFileSync(currentPath, 'utf8'));
     }
     const data = properties.filter(ele => {
         const userObj = ele.user
@@ -81,8 +82,9 @@ export const userProperties = (req: Request, res: Response) => {
 export const userList = (_req: Request, res: Response) => {
     const uniqueIds: string[] = [];
     let properties: Property[] = []
-    if (fs.existsSync('../../properties.json')) {
-        properties = JSON.parse(fs.readFileSync('../../properties.json', 'utf8'));
+    const currentPath = `${process.cwd()}/properties.json`;
+    if (fs.existsSync(currentPath)) {
+        properties = JSON.parse(fs.readFileSync(currentPath, 'utf8'));
     }
     const unique = properties.filter(element => {
         if (element.user.userId !== "") {

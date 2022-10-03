@@ -27,11 +27,6 @@ export const getUrls = async (pages: number = 1) => {
     const cluster: Cluster<string> = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_PAGE,
         maxConcurrency: 10,
-        puppeteerOptions: {
-            headless: false,
-            args: ["--no-sandbox"],
-            executablePath: '/usr/bin/chromium-browser'
-        },
     });
     let list: string[] = []
     const urls = [
@@ -70,12 +65,6 @@ export const getMultipleUrls = async (listurl: string[]) => {
     const cluster: Cluster<string> = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_PAGE,
         maxConcurrency: 10,
-        puppeteerOptions: {
-            headless: false,
-            args: ["--no-sandbox"],
-            executablePath: '/usr/bin/chromium-browser'
-        },
-        
     });
     const list: Property[] = []
     await cluster.task(async ({ page, data: url }) => {
