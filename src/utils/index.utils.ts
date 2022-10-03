@@ -35,7 +35,20 @@ export const getUrls = async (pages: number = 1) => {
         'https://www.metrocuadrado.com/venta',
         'https://www.metrocuadrado.com/arriendo'
     ]
+   
+
+
     await cluster.task(async ({ page, data: url }) => {
+        await page.setRequestInterception(true);
+        
+        page.on("request", (req) => {
+            if (req.resourceType() == "font" || req.resourceType() == "image") {
+                req.abort();
+            } else {
+                req.continue();
+            }
+        });
+
         await page.goto(url);
         for (let i = 0; i <= pages; i++) {
             const listProperties = await page.evaluate(() => {
@@ -68,6 +81,15 @@ export const getMultipleUrls = async (listurl: string[]) => {
     });
     const list: Property[] = []
     await cluster.task(async ({ page, data: url }) => {
+        await page.setRequestInterception(true);
+        
+        page.on("request", (req) => {
+            if (req.resourceType() == "font" || req.resourceType() == "image") {
+                req.abort();
+            } else {
+                req.continue();
+            }
+        });
         await page.goto(url);
         const property = await page.evaluate(() => {
             const dataGeneral = document.querySelector('#__NEXT_DATA__')?.textContent as string
