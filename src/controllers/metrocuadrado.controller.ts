@@ -7,26 +7,27 @@ import fs from 'fs'
 
 export async function generateData(req: Request, _res: Response) {
     const pages: number = parseInt(req.params.pages as string)
-    const properties: Property[] = await getListProperties(pages)
-    if (properties.length > 0) {
-        fs.writeFile('./properties.json', JSON.stringify(properties, null, 2), (error) => {
-            if (error) {
-                _res.json({
-                    'response': error
-                })
-            }
-            else {
-                _res.json({
-                    'response': 'Se ha generado el archivo JSON',
-                    'propertiesTotal': properties.length
-                })
-            }
-        })
-    } else {
-        _res.json({
-            'response': 'No se ha encontrado registros nuevos'
-        })
-    }
+    const properties: string[] = await getListProperties(pages)
+    // if (properties.length > 0) {
+    //     fs.writeFile('./properties.json', JSON.stringify(properties, null, 2), (error) => {
+    //         if (error) {
+    //             _res.json({
+    //                 'response': error
+    //             })
+    //         }
+    //         else {
+    //             _res.json({
+    //                 'response': 'Se ha generado el archivo JSON',
+    //                 'propertiesTotal': properties.length
+    //             })
+    //         }
+    //     })
+    // } else {
+    //     _res.json({
+    //         'response': 'No se ha encontrado registros nuevos'
+    //     })
+    // }
+    _res.json(properties)
 }
 export const userProperties = (req: Request, res: Response) => {
     const obj = req.params
@@ -76,6 +77,7 @@ export const userProperties = (req: Request, res: Response) => {
     const propertiesList = {
         "xml": propertiesTmp
     }
+    // res.setHeader('Content-disposition', 'attachment; filename=mixml.xml');
     res.set('Content-Type', 'text/xml');
     res.send(xml([propertiesList], true))
 }
@@ -120,6 +122,6 @@ export const userList = (_req: Request, res: Response) => {
     const usersList = {
         "userXML": users
     }
-    res.set('Content-Type', 'text/xml');
+    res.set('Content-Type', 'text/xml')
     res.send(xml([usersList], true))
 }

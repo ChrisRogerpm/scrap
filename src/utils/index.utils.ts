@@ -16,12 +16,8 @@ export const getListProperties = async (pages: number) => {
             idDormitorios: getBedRooms(property.idDormitorios),
             idBanios: getBathRooms(property.idBanios)
         }
-    }).filter((el) => {
-        return el.departamento !== "0"
-    }).filter((el) => {
-        return el.zona !== "0"
     })
-    return listProperties
+    return listUrls
 }
 export const getUrls = async (pages: number = 1) => {
     const cluster: Cluster<string> = await Cluster.launch({
@@ -35,22 +31,10 @@ export const getUrls = async (pages: number = 1) => {
         'https://www.metrocuadrado.com/venta',
         'https://www.metrocuadrado.com/arriendo'
     ]
-   
-
-
     await cluster.task(async ({ page, data: url }) => {
-        await page.setRequestInterception(true);
-        
-        page.on("request", (req) => {
-            if (req.resourceType() == "font" || req.resourceType() == "image") {
-                req.abort();
-            } else {
-                req.continue();
-            }
-        });
-
         await page.goto(url);
-        for (let i = 0; i <= pages; i++) {
+        let listTmp: string[] = []
+        for (let i = 1; i <= pages; i++) {
             const listProperties = await page.evaluate(() => {
                 const links = document.querySelectorAll('.card-result-img a')
                 const list: string[] = []
@@ -60,15 +44,18 @@ export const getUrls = async (pages: number = 1) => {
                 })
                 return list
             })
-            list = list.concat(listProperties)
+            listTmp = listTmp.concat(listProperties)
             await page.evaluate(() => {
                 const el: HTMLElement = document.querySelector('a[aria-label="Next"]') as HTMLElement
                 el?.click()
             })
+            await page.waitForTimeout(1000);
         }
+        return listTmp
     });
     for (let link of urls) {
-        cluster.queue(link);
+        const result = await cluster.execute(link);
+        list.push(...result);
     }
     await cluster.idle();
     await cluster.close();
@@ -82,7 +69,7 @@ export const getMultipleUrls = async (listurl: string[]) => {
     const list: Property[] = []
     await cluster.task(async ({ page, data: url }) => {
         await page.setRequestInterception(true);
-        
+
         page.on("request", (req) => {
             if (req.resourceType() == "font" || req.resourceType() == "image") {
                 req.abort();
